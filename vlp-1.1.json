@@ -1,0 +1,279 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vigilith.ai/schemas/vlp/1.1",
+  "title": "Vigilith Language Protocol (VLP) v1.1",
+  "description": "Structured messaging format for AI agent communication with accountability, provenance, and quantified confidence.",
+  "type": "object",
+  "required": ["id", "protocol", "type", "timestamp", "sender", "content", "confidence"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique message identifier (UUID or sequential ID)"
+    },
+    "protocol": {
+      "type": "string",
+      "const": "VLP/1.1",
+      "description": "Protocol version identifier"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["claim", "evidence", "query", "response", "correction", "notice"],
+      "description": "Message type determining validation rules"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp of message creation"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Groups related message exchanges"
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Sequential index within session"
+    },
+    "sender": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Originating agent identifier"
+    },
+    "receiver": {
+      "type": "string",
+      "description": "Intended target agent identifier"
+    },
+    "topic": {
+      "type": "string",
+      "description": "Domain category (e.g., 'content_ops', 'security', 'field_service')"
+    },
+    "content": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" }
+      ],
+      "description": "Main message content (text or structured data)"
+    },
+    "payload": {
+      "type": "object",
+      "description": "Machine-actionable structured parameters",
+      "additionalProperties": true
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Sender's certainty about content correctness (0.0-1.0)"
+    },
+    "provenance": {
+      "type": "array",
+      "description": "Evidence sources supporting the message",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string",
+            "format": "uri",
+            "description": "Simple URI reference"
+          },
+          {
+            "type": "object",
+            "description": "Structured provenance reference",
+            "properties": {
+              "ref": {
+                "type": "string",
+                "description": "Reference URI or identifier"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["url", "hash", "document", "api", "snapshot"],
+                "description": "Reference type"
+              },
+              "hash": {
+                "type": "string",
+                "description": "Content hash for integrity verification"
+              },
+              "fetched_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "When the reference was fetched/verified"
+              }
+            },
+            "required": ["ref"]
+          }
+        ]
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "description": "Policy, style, or safety conditions",
+      "items": {
+        "type": "string"
+      }
+    },
+    "safety": {
+      "type": "object",
+      "description": "Content safety and compliance triage",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["safe", "review", "block"],
+          "description": "Safety classification level"
+        },
+        "issues": {
+          "type": "array",
+          "description": "Detected issues requiring attention",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Issue code identifier"
+              },
+              "detail": {
+                "type": "string",
+                "description": "Human-readable issue description"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "critical"],
+                "description": "Issue severity level"
+              }
+            },
+            "required": ["code"]
+          }
+        },
+        "requires_human": {
+          "type": "boolean",
+          "description": "Whether human review is required"
+        }
+      }
+    },
+    "refers_to": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ],
+      "description": "Reference(s) to prior message IDs"
+    },
+    "intent": {
+      "type": "object",
+      "description": "Context layer: goal and risk classification",
+      "properties": {
+        "goal": {
+          "type": "string",
+          "description": "What the message intends to accomplish"
+        },
+        "risk_level": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"],
+          "description": "Risk classification of the action"
+        }
+      }
+    },
+    "context_metrics": {
+      "type": "object",
+      "description": "Validator-computed context scores (read-only)",
+      "readOnly": true,
+      "properties": {
+        "context_depth": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "description": "Count of verified context layers"
+        },
+        "context_integrity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Weighted verification score"
+        },
+        "context_debt": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "1 - integrity; technical debt metric"
+        },
+        "layers_verified": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Which context layers passed verification"
+        },
+        "layers_missing": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Which context layers are absent or failed"
+        }
+      }
+    },
+    "validator_meta": {
+      "type": "object",
+      "description": "Validator metadata (read-only)",
+      "readOnly": true,
+      "properties": {
+        "validator_id": { "type": "string" },
+        "validator_version": { "type": "string" },
+        "policy_set": { "type": "string" },
+        "validated_at": { "type": "string", "format": "date-time" },
+        "gate": {
+          "type": "string",
+          "enum": ["pass", "review", "block"],
+          "description": "Enforcement gate decision"
+        }
+      }
+    },
+    "_extras": {
+      "type": "object",
+      "description": "Forward-compatible metadata container",
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "type": { "const": "evidence" } }
+      },
+      "then": {
+        "required": ["refers_to", "provenance"],
+        "properties": {
+          "provenance": { "minItems": 1 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "type": { "enum": ["response", "correction"] } }
+      },
+      "then": {
+        "required": ["refers_to"]
+      }
+    },
+    {
+      "if": {
+        "properties": { 
+          "confidence": { "minimum": 0.9 }
+        }
+      },
+      "then": {
+        "anyOf": [
+          {
+            "properties": {
+              "provenance": { "minItems": 1 }
+            },
+            "required": ["provenance"]
+          },
+          {
+            "properties": {
+              "safety": {
+                "properties": {
+                  "level": { "const": "review" }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "additionalProperties": true
+}
