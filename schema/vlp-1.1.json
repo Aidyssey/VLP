@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://vigilith.ai/schemas/vlp-1.1.json",
+  "title": "Vigilith Language Protocol (VLP) v1.1",
+  "description": "Canonical VLP message schema. Runtime enforces additional semantic rules (evidence chains, confidence/provenance constraints).",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["id", "protocol", "type", "timestamp", "sender", "content", "confidence"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 3,
+      "description": "Unique message identifier"
+    },
+    "protocol": {
+      "type": "string",
+      "const": "VLP/1.1",
+      "description": "Protocol version identifier"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["claim", "evidence", "query", "response", "correction", "notice", "session_context"],
+      "description": "Message type (lowercase). session_context is for agent memory persistence across sessions."
+    },
+    "timestamp": {
+      "type": "string",
+      "minLength": 10,
+      "description": "ISO 8601 UTC timestamp"
+    },
+    "session_id": {
+      "type": ["string", "null"],
+      "description": "Session grouping identifier. Format: S-{YYYY-MM-DD}-{agent_slug}-{short_uuid}"
+    },
+    "seq": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Sequence number within session"
+    },
+    "sender": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Originating agent identifier"
+    },
+    "receiver": {
+      "type": ["string", "null"],
+      "description": "Target agent identifier"
+    },
+    "topic": {
+      "type": ["string", "null"],
+      "description": "Message topic/category"
+    },
+    "content": {
+      "type": ["string", "object"],
+      "description": "Message payload (string or structured object)"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Certainty score (0.0 = no confidence, 1.0 = absolute certainty)"
+    },
+    "provenance": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "properties": {
+              "ref": { "type": "string", "description": "Reference URI or identifier" },
+              "kind": {
+                "type": "string",
+                "enum": ["url", "hash", "document", "api", "snapshot", "log", "excerpt", "other"],
+                "description": "Reference type"
+              },
+              "hash": { "type": "string", "description": "Content hash (e.g., sha256:...)" },
+              "excerpt": { "type": "string", "description": "Quoted text excerpt" },
+              "fetched_at": { "type": "string", "description": "When the reference was fetched" }
+            },
+            "required": ["ref"]
+          }
+        ]
+      },
+      "default": [],
+      "description": "Evidence sources (URIs, hashes, structured refs)"
+    },
+    "constraints": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Behavioral constraints (e.g., 'tone: formal')"
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["safe", "review", "block"],
+          "description": "Safety classification level"
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "code": { "type": "string", "description": "Issue code identifier" },
+              "detail": { "type": "string", "description": "Human-readable description" }
+            }
+          },
+          "default": [],
+          "description": "List of issues/warnings"
+        },
+        "requires_human": {
+          "type": "boolean",
+          "description": "Whether human review is required"
+        }
+      },
+      "required": ["level", "issues"],
+      "default": { "level": "safe", "issues": [] }
+    },
+    "refers_to": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } },
+        { "type": "null" }
+      ],
+      "description": "Reference to prior message(s) being responded to, corrected, or evidenced"
+    },
+    "keywords": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Searchable keywords for agent memory retrieval. Enables cross-session context discovery."
+    },
+    "payload": {
+      "type": ["object", "null"],
+      "description": "Additional structured data specific to message type"
+    },
+    "_extras": {
+      "type": "object",
+      "description": "Extension fields for custom implementations"
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "name": "@vigilith/vlp",
+  "version": "1.1.0",
+  "description": "Vigilith Language Protocol - Accountable AI agent messaging",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "protocol",
+    "messaging",
+    "vlp",
+    "vigilith"
+  ],
+  "author": "Vigilith <dev@vigilith.ai>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Aidyssey/VLP.git"
+  },
+  "homepage": "https://github.com/Aidyssey/VLP#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}
