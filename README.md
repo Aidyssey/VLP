@@ -33,10 +33,10 @@ from vlp import make_message, validate_vlp
 msg = make_message(
     "claim",
     sender="ResearchAgent",
-    content="Found 5 gas stations in zip 73102",
+    content="Found 12 matching records in dataset",
     confidence=0.85,
-    provenance=["google_places_api"],
-    keywords=["research", "stations", "oklahoma"]
+    provenance=["database_query"],
+    keywords=["research", "records", "dataset"]
 )
 
 # Validate any VLP message
@@ -55,10 +55,10 @@ import { makeMessage, validateVlp } from '@vigilith/vlp';
 const msg = makeMessage({
   type: 'claim',
   sender: 'ResearchAgent',
-  content: 'Found 5 gas stations in zip 73102',
+  content: 'Found 12 matching records in dataset',
   confidence: 0.85,
-  provenance: ['google_places_api'],
-  keywords: ['research', 'stations', 'oklahoma']
+  provenance: ['database_query'],
+  keywords: ['research', 'records', 'dataset']
 });
 
 const { valid, errors } = validateVlp(msg);

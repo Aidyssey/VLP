@@ -22,10 +22,10 @@ VLP defines seven message types, each with specific semantics and validation rul
 {
   "type": "claim",
   "sender": "The Observer",
-  "content": "Found 5 gas stations in zip 73102",
+  "content": "Found 15 records matching filter criteria",
   "confidence": 0.85,
-  "provenance": ["google_places_api"],
-  "keywords": ["research", "stations", "oklahoma"]
+  "provenance": ["database_query"],
+  "keywords": ["research", "records", "filtered"]
 }
 ```
 
@@ -47,9 +47,9 @@ VLP defines seven message types, each with specific semantics and validation rul
 {
   "type": "evidence",
   "sender": "The Observer",
-  "content": "Address verified via USPS API",
+  "content": "Data verified via schema validator",
   "confidence": 0.95,
-  "provenance": ["usps_api", "https://tools.usps.com/verify"],
+  "provenance": ["json_schema", "https://json-schema.org/"],
   "refers_to": "MSG-claim-001"
 }
 ```
@@ -72,7 +72,7 @@ VLP defines seven message types, each with specific semantics and validation rul
   "type": "query",
   "sender": "The Archivist",
   "receiver": "The Observer",
-  "content": "What addresses were found for these stations?",
+  "content": "What schema details were found for these records?",
   "confidence": 1.0
 }
 ```
@@ -94,7 +94,7 @@ VLP defines seven message types, each with specific semantics and validation rul
   "type": "response",
   "sender": "The Observer",
   "receiver": "The Archivist",
-  "content": {"stations": [{"name": "QuikTrip", "address": "123 Main St"}]},
+  "content": {"records": [{"id": "REC-001", "name": "Sample Record", "status": "active"}]},
   "confidence": 0.9,
   "refers_to": "MSG-query-001"
 }
@@ -118,7 +118,7 @@ VLP defines seven message types, each with specific semantics and validation rul
 {
   "type": "correction",
   "sender": "The Observer",
-  "content": "Correction: 4 stations found, not 5 (duplicate removed)",
+  "content": "Correction: 14 records found, not 15 (duplicate removed)",
   "confidence": 0.95,
   "provenance": ["dedup_audit"],
   "refers_to": "MSG-claim-001"
@@ -171,14 +171,14 @@ VLP defines seven message types, each with specific semantics and validation rul
 {
   "type": "session_context",
   "sender": "The Observer",
-  "content": "Research completed. 7 stations verified, 1 pending review.",
+  "content": "Research completed. 31 records verified, 1 pending review.",
   "session_id": "S-2025-01-04-observer-abc123",
   "confidence": 1.0,
   "keywords": ["research", "complete", "pending:manual-review"],
   "payload": {
     "completed": ["api_query", "verification"],
     "pending": ["manual_review"],
-    "next_session_hints": ["Resolve unverified address"]
+    "next_session_hints": ["Resolve failed validation"]
   }
 }
 ```

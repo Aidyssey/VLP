@@ -87,7 +87,7 @@ msg = make_message(
 ```python
 context_msg = registry.end_session(
     session,
-    summary="Research completed. 5 stations found."
+    summary="Research completed. 15 records processed."
 )
 
 # context_msg is a session_context message with:
@@ -105,18 +105,18 @@ The `session_context` type is used at session end to persist context:
   "type": "session_context",
   "session_id": "S-2025-01-04-observer-abc123",
   "sender": "The Observer",
-  "content": "Research completed. 5 stations found, 1 needs review.",
+  "content": "Research completed. 15 records processed, 1 needs review.",
   "keywords": ["research", "complete", "pending:manual-review"],
   "payload": {
     "agent_number": 4,
     "started_at": "2025-01-04T10:00:00Z",
     "ended_at": "2025-01-04T10:30:00Z",
     "total_messages": 12,
-    "completed": ["api_query", "address_verification", "notion_export"],
-    "pending": ["manual_address_review"],
+    "completed": ["api_query", "schema_validation", "database_export"],
+    "pending": ["manual_record_review"],
     "next_session_hints": [
-      "Resolve unverified address for Quick Stop #77",
-      "Expand search to 73103 zip code"
+      "Resolve validation error for record REC-077",
+      "Expand search to include archived records"
     ]
   }
 }
@@ -130,10 +130,10 @@ Use keywords to enable cross-session discovery:
 {
   "keywords": [
     "research",           // Topic
-    "oklahoma",          // Location
-    "73102",             // Identifier
-    "complete",          // Status
-    "pending:review"     // Action needed
+    "customers",          // Dataset
+    "2025-Q1",            // Identifier
+    "complete",           // Status
+    "pending:review"      // Action needed
   ]
 }
 ```

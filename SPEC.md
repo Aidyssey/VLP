@@ -80,22 +80,22 @@ Every VLP message MUST include:
   "sender": "The Observer",
   "receiver": "The Archivist",
   "topic": "research",
-  "content": "Found 5 gas stations in zip 73102 matching criteria.",
+  "content": "Found 15 records matching filter criteria in dataset.",
   "confidence": 0.85,
   "provenance": [
-    "google_places_api",
+    "database_query",
     {"ref": "https://api.example.com/results/123", "kind": "url"}
   ],
   "constraints": ["tone: formal"],
-  "keywords": ["research", "stations", "oklahoma", "73102"],
+  "keywords": ["research", "records", "dataset", "filtered"],
   "safety": {
     "level": "safe",
     "issues": []
   },
   "refers_to": null,
   "payload": {
-    "station_count": 5,
-    "zip_code": "73102"
+    "record_count": 15,
+    "filter_applied": "active_only"
   },
   "_extras": {}
 }
@@ -190,7 +190,7 @@ Amends a prior message with updated information.
 ```json
 {
   "type": "correction",
-  "content": "Correction: 4 stations found, not 5 (one was duplicate)",
+  "content": "Correction: 14 records found, not 15 (one was duplicate)",
   "refers_to": "MSG-claim-001",
   "confidence": 0.95,
   "provenance": ["dedup_audit_log"]
@@ -230,13 +230,13 @@ Persists agent context for future sessions.
 ```json
 {
   "type": "session_context",
-  "content": "Completed research on Oklahoma gas stations. Next: verify pricing data.",
+  "content": "Completed data extraction workflow. Next: verify export formats.",
   "session_id": "S-2025-01-04-observer-abc123",
-  "keywords": ["research", "oklahoma", "stations", "pending:pricing"],
+  "keywords": ["research", "extraction", "data", "pending:export"],
   "payload": {
-    "completed": ["station_discovery", "address_verification"],
-    "pending": ["price_verification"],
-    "next_session_hints": ["Start with pricing API calls"]
+    "completed": ["data_discovery", "schema_verification"],
+    "pending": ["export_verification"],
+    "next_session_hints": ["Start with export format validation"]
   }
 }
 ```
@@ -421,7 +421,7 @@ The `keywords` field enables cross-session memory retrieval:
 
 ```json
 {
-  "keywords": ["research", "oklahoma", "stations", "73102"]
+  "keywords": ["research", "dataset", "records", "filtered"]
 }
 ```
 
